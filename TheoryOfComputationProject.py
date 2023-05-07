@@ -36,7 +36,19 @@ def main():
             print("This is an invalid string for L={a^n b^n|n>=0} Try Again!")
             continue
 
-        print(f"========Table for: {string} ========\n")
+        if step_counter == 0:
+            print(f"========Table for: {string} ========\n")
+            table = [
+                ["Step:", step_counter],
+                ["State:", "p"],
+                ["Unread Input:", "".join(list(queue))],
+                ["Stack:", "".join(list(stack[::-1]))],
+                ["Rule number:", "n/a"],
+                ["Rule:", "n/a"],
+            ]
+            print_table(table)
+            step_counter += 1
+
         if queue:
             while queue or stack:
                 # Rule 0
@@ -55,7 +67,7 @@ def main():
                     stack.append("e")
                     break
                 # Rule 2
-                elif current_state == "q":
+                elif current_state == "q" and queue[0] == "a":
                     ruleNumber = "#2"
                     queue.popleft()
                     current_state = "qa"
