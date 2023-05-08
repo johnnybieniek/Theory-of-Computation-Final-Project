@@ -1,10 +1,27 @@
 from collections import deque, Counter
 from time import sleep
 
+"""
+Rules used in our program:
 
+0. (p, e, e) → (q, S) 
+1. (q, a, e) → (qa, e) 
+2. (q, b, e) → (qb, e)
+3. (qa, e, a) → (q, e)
+4. (qa, e, S) → (qa, aSb)
+5. (qb, e, b) → (q, e)
+6. (qb, e, S) → (qb, e)
+7. (q, $, e) → (q$, e)
+
+
+"""
+
+
+# function to print a table row
 def print_table(table):
     for row in table:
         print(f"{row[0]:<15} {row[1]}")
+    print("-------------------------")
     print()
 
 
@@ -18,7 +35,7 @@ def main():
     while True:
         step_counter = 0
         stack = []
-        rule = ""
+
         ruleNumber = ""
         current_state = "p"
         string = input(f"Enter String Here: ")
@@ -36,7 +53,7 @@ def main():
             print("This is an invalid string for L={a^n b^n|n>=0} Try Again!")
             continue
 
-        if step_counter == 0:
+        if step_counter == 0 and len(string) > 0:
             print(f"========Table for: {string} ========\n")
             table = [
                 ["Step:", step_counter],
@@ -44,9 +61,9 @@ def main():
                 ["Unread Input:", "".join(list(queue))],
                 ["Stack:", "".join(list(stack[::-1]))],
                 ["Rule number:", "n/a"],
-                ["Rule:", "n/a"],
             ]
             print_table(table)
+            print("-------------------------")
             step_counter += 1
 
         if queue:
@@ -56,66 +73,53 @@ def main():
                     ruleNumber = "#0"
                     current_state = "q"
                     stack.append("s")
-                    rule = "(p, e, e) → (q, S)"
+
                 # Rule 1
-                elif current_state == "q" and queue[0] == "$":
-                    ruleNumber = "#1"
-                    current_state = "q$"
-                    queue.popleft()
-                    rule = "(q, $, e) → (q$, e)"
-                    queue.append("e")
-                    stack.append("e")
-                    break
-                # Rule 2
                 elif current_state == "q" and queue[0] == "a":
-                    ruleNumber = "#2"
+                    ruleNumber = "#1"
                     queue.popleft()
                     current_state = "qa"
-                    rule = "(q, a, e) → (qa, e)"
 
-                # Rule 3
+                # Rule 2
                 elif current_state == "q" and queue[0] == "b":
-                    ruleNumber = "#3"
+                    ruleNumber = "#2"
                     queue.popleft()
                     current_state = "qb"
-                    rule = "(q, b, e) → (qb, e)"
 
-                # Rule 4
+                # Rule 3
                 elif current_state == "qa" and stack[-1] == "a":
-                    ruleNumber = "#4"
+                    ruleNumber = "#3"
                     current_state = "q"
                     stack.pop()
-                    rule = "(qa, e, a) → (q, e)"
-                # Rule 5
+
+                # Rule 4
                 elif current_state == "qa" and stack[-1] == "s":
-                    ruleNumber = "#5"
+                    ruleNumber = "#4"
                     stack.pop()
                     stack.append("b")
                     stack.append("s")
                     stack.append("a")
-                    rule = "(qa, e, S) → (qa, aSb)"
 
-                # Rule 6
+                # Rule 5
                 elif current_state == "qb" and stack[-1] == "b":
-                    ruleNumber = "#6"
+                    ruleNumber = "#5"
                     stack.pop()
                     current_state = "q"
-                    rule = "(qb, e, b) → (q, e)"
-                # Rule 7
-                elif current_state == "qb" and stack[-1] == "s":
-                    ruleNumber = "#7"
-                    stack.pop()
-                    rule = "(qb, e, S) → (qb, e)"
 
-                # Rule 8
-                elif current_state == "q$" and stack[-1] == "s":
-                    ruleNumber = "#8"
+                # Rule 6
+                elif current_state == "qb" and stack[-1] == "s":
+                    ruleNumber = "#6"
                     stack.pop()
-                    rule = "(q, $, e) → (q$, e)"
-                # Rule 9
-                elif current_state == "q$":
-                    ruleNumber = "#9"
-                    rule = "(q$, e, S) → (q$, e)"
+
+                # Rule 7
+                elif current_state == "q" and queue[0] == "$":
+                    ruleNumber = "#7"
+                    current_state = "q$"
+                    queue.popleft()
+
+                    queue.append("e")
+                    stack.append("e")
+                    break
 
                 # Generating a list to print the table after doing a step
                 table = [
@@ -124,9 +128,9 @@ def main():
                     ["Unread Input:", "".join(list(queue))],
                     ["Stack:", "".join(list(stack[::-1]))],
                     ["Rule number:", ruleNumber],
-                    ["Rule:", rule],
                 ]
                 print_table(table)
+                print("-------------------------")
                 step_counter += 1
 
             # Generating a list to print the table once the remaining string is empty
@@ -136,26 +140,27 @@ def main():
                 ["Unread Input:", "".join(list(queue))],
                 ["Stack:", "".join(list(stack[::-1]))],
                 ["Rule number:", ruleNumber],
-                ["Rule:", rule],
             ]
             print_table(table)
+            print("-------------------------")
         else:
             # Generating a list to print the table if the inputed string was an empty string
             if not string:
                 queue.append("e")
                 stack.append("e")
                 current_state = "q"
-                rule = "empty"
+
                 table = [
                     ["Step:", step_counter],
                     ["State:", current_state],
                     ["Unread Input:", "".join(list(queue))],
                     ["Stack:", "".join(list(stack[::-1]))],
                     ["Rule number:", ruleNumber],
-                    ["Rule:", rule],
                 ]
                 print_table(table)
 
 
 if __name__ == "__main__":
     main()
+
+    
